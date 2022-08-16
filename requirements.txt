@@ -15,7 +15,7 @@ cffi==1.14.5
 cftime==1.5.0
 chardet==4.0.0
 contextlib2==21.6.0
-coverage==5.5
+coverage==6.4.4
 cycler==0.10.0
 dataclasses==0.6
 decorator==4.4.2
