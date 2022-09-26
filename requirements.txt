@@ -120,7 +120,7 @@ Send2Trash==1.7.1
 six==1.15.0
 smmap==4.0.0
 tabulate==0.8.9
-tensorboard==2.5.0
+tensorboard==2.10.1
 tensorboard-plugin-wit==1.8.0
 tensorflow==2.5.0
 tensorflow-estimator==2.5.0
