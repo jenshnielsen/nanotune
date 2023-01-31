@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data &mdash; nanotune 0+untagged.1240.g4999340 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Data fitting" href="../fit/index.html" />
+    <link rel="prev" title="Instruments &amp; interfaces" href="../drivers/index.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> nanotune
+          </a>
+              <div class="version">
+                0+untagged.1240.g4999340
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quantum_dots/index.html">Quantum dots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuning/index.html">Tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../device/index.html">Device abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../drivers/index.html">Instruments &amp; interfaces</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#databases">Databases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-flow">Data flow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../fit/index.html">Data fitting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../classification/index.html">Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../capacitance_model/index.html">Capacitance model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">nanotune API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">nanotune</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Data</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/data/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="data">
+<span id="id1"></span><h1>Data<a class="headerlink" href="#data" title="Permalink to this heading"></a></h1>
+<p>Typical manual-tuning-inspired measurements are one- and two-dimensional traces
+on a grid. While this is fairly limiting when dealing with multi-dimensional
+spaces, it is currently the only human-analyzable way of taking data. As
+nanotune’s
+tuning sequence is based on existing manual procedures, the measurements it
+supports are 1D and 2D traces.</p>
+<p>All measurements are done using QCoDeS and are thus saved to a database via a
+QCoDeS dataset. However, nanotune has its own dataset
+abstraction with a few extra functionalities convenient for tuning.</p>
+<section id="dataset">
+<h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this heading"></a></h2>
+<p>The dataset class emulates a QCoDeS dataset in order to standardize a few
+naming conventions and adding post-processing steps. Using QCoDeS’s
+<cite>to_xarray_dataset</cite>, raw data is loaded into an xarray called <cite>raw_data</cite>.
+Using the normalization constants saved to metadata of the QCoDeS dataset,
+the raw data is normalized and retained in the <cite>data</cite> attribute, also an
+xarray dataset.
+The variables of this xarray are renamed to match the
+standardized readout methods ‘transport’, ‘sensing’ and ‘rf’. The reason being that
+tuning and classification procedures need to know which trace belongs to which
+readout methods. The information which readout instruments corresponds to which
+readout method is saved to metadata during measurements.
+Similarly, xarray datasets with a filtered signal and the power spectrum are
+computed as well.</p>
+<p>In general, all data measured with QCoDeS can be loaded into a nanotune
+dataset. However, data not measured using nanotune will miss some metadata and
+thus its normalization will be incorrect.
+The required metadata is saved into QCoDeS’ snapshot under the <cite>nt.meta_tag</cite> key,
+which is defined in <cite>nanotune.configuration.config.json</cite>.</p>
+<p>The following code is an example of how to load data into a nanotune dataset.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">nanotune</span> <span class="k">as</span> <span class="nn">nt</span>
+
+<span class="n">nt_root</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)))</span>
+<span class="n">db_pinchoff</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;tuning&#39;</span><span class="p">,</span> <span class="s1">&#39;device_characterization.db&#39;</span><span class="p">)</span>
+
+<span class="n">ds</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="mi">1203</span><span class="p">,</span> <span class="n">db_pinchoff</span><span class="p">,</span> <span class="n">db_folder</span><span class="o">=</span><span class="n">nt_root</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For more details see also <a class="reference internal" href="../examples/dataset_example.html"><span class="doc">the dataset example notebook</span></a>,</p>
+</section>
+<section id="databases">
+<h2>Databases<a class="headerlink" href="#databases" title="Permalink to this heading"></a></h2>
+<p>As shown above and as opposed to QCoDes, nanotune does not rely on data run IDs
+only. It also needs the database name and optionally the folder where the
+database is located to find data.
+The reason is that the volume of data recorded during automated tuning grows
+significantly faster than during manual tuning. Not only becomes copying
+databases larger than 10Gb cumbersome, but sometimes one wishes to
+save data to several databases. One example are parallel
+measurements, for which one database per sample could be used to avoid locked
+.db files.</p>
+<p>To facilitate switching databases as well as other tuning/classification
+related functionalities, nanotune has a few helper functions.
+The most used one simply sets a different database as the default accessed by
+QCoDeS and nanotune:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nanotune</span> <span class="k">as</span> <span class="nn">nt</span>
+<span class="n">nt</span><span class="o">.</span><span class="n">set_database</span><span class="p">(</span><span class="s2">&quot;examples.db&quot;</span><span class="p">,</span> <span class="n">db_folder</span><span class="o">=</span><span class="s2">&quot;./&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Further, there are also functions searching for data with a specific machine
+learning label, e.g. good pinchoffs. As these labels occupy a separate column in
+the database, these functions utilize efficient SQLite queries.
+The columns are initialized whenever a database is created using
+‘nt.new_database’.</p>
+</section>
+<section id="data-flow">
+<h2>Data flow<a class="headerlink" href="#data-flow" title="Permalink to this heading"></a></h2>
+<p>The diagram shown in <a class="reference internal" href="#fig-data-flow"><span class="std std-numref">Fig. 13</span></a> illustrates the data and
+instruction flow of quantum measurements.
+The dotted ellipses indicates which stages are covered by QCoDeS or nanotune.
+QCoDeS provides an interface to room-temperature instruments (i.e. drivers)
+and tools to take and save measurements, while nanotune extends this functionality
+by automating common procedures encountered during quantum dot initialization.</p>
+<figure class="align-center" id="id2">
+<span id="fig-data-flow"></span><a class="reference internal image-reference" href="../_images/nanotune_data_flow-02.svg"><img alt="Data flow in nanotune." src="../_images/nanotune_data_flow-02.svg" width="100.0%" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 13 </span><span class="caption-text">Data flow during tuning with nanotune.</span><a class="headerlink" href="#id2" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<p>As stated above, all data is taken via QCoDeS, specifically by making use of its
+measurement context manager. The data is taken during the device
+characterization and dot-tuning sequence, which is implemented by the
+<a class="reference internal" href="../tuning/device_tuner.html#device-tuner"><span class="std std-ref">Device tuner</span></a> classes <cite>Tuner</cite>, <cite>Characterizer</cite> and <cite>DotTuner</cite>.
+Specifically, the tuner classes call
+<a class="reference internal" href="../tuning/tuningstages.html#tuningstages"><span class="std std-ref">Tuningstages</span></a> subclasses, i.e. <cite>GateCharacterization1D</cite> and
+<cite>ChargeDiagram</cite>, which are responsible for measurements and correct metadata
+saving.</p>
+<p>Once measured, the data is loaded into nanotune’s dataset, where the raw data is
+post-processed, e.g. normalized. If required, Fourier frequencies or
+filtered data is computed as well. The <cite>DataFit</cite> classes then extract features
+such as the slope and amplitude of a pinchoff curve.
+Based on these features as well as min and max values of the measured signal,
+the device’s transport regime, i.e. open, intermediate or
+closed, can be determined. Either the extracted feature
+vector or entire measurement is passed to the classifier for quality or
+charge state prediction. Based on the outcome, a decision about
+subsequent tuning is made.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../drivers/index.html" class="btn btn-neutral float-left" title="Instruments &amp; interfaces" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../fit/index.html" class="btn btn-neutral float-right" title="Data fitting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jana Darulova.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

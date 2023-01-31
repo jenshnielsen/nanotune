@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantum dots &mdash; nanotune 0+untagged.1240.g4999340 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tuning" href="../tuning/index.html" />
+    <link rel="prev" title="Overview" href="../overview/index.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> nanotune
+          </a>
+              <div class="version">
+                0+untagged.1240.g4999340
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quantum dots</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dots-in-a-two-dimensional-heterostructure-2deg">Dots in a two-dimensional heterostructure (2DEG)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#transport-through-quantum-dots">Transport through quantum dots</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tuning/index.html">Tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../device/index.html">Device abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../drivers/index.html">Instruments &amp; interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/index.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit/index.html">Data fitting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../classification/index.html">Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../capacitance_model/index.html">Capacitance model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">nanotune API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">nanotune</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Quantum dots</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/quantum_dots/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="quantum-dots">
+<h1>Quantum dots<a class="headerlink" href="#quantum-dots" title="Permalink to this heading"></a></h1>
+<p>Adapted from Jana’s thesis.</p>
+<p>Quantum dots are artificially structured systems confining charges within
+regions small enough to make their quantum mechanical energy levels
+observable (Hanson et al. 2007,  Ihn book chapter 18).
+While it is a physical system made up of atoms, each having many electrons,
+the relevant particles of interest are the free electrons which can be
+manipulated and probed with electric fields.
+Quantum dots confining a small number of free electrons can be formed
+in many different systems, but the main system of interest for charge, spin and
+topological qubits are gate-defined quantum dots.
+Here, lithographically fabricated gate electrodes in proximity of a nanowire
+or on top of the surface of a heterostructure are used to create a potential
+landscape with wells and barriers. Together with the system’s geometry, this
+potential landscape confines charges in all three dimensions.  As a result of
+this confinement and opposed to the continuum of states that typically occur
+in macroscopic systems, quantum dots feature a discrete energy spectrum. For
+this reason, quantum dots are sometimes called artificial atoms
+(Kouwenhoven et al. 2001).
+In what follows, we focus on quantum dots formed in two-dimensional
+electron gas (2DEG) in a GaAs/AlGaAs heterostructure, illustrated in figure
+<a class="reference internal" href="#fig-2deg"><span class="std std-numref">Fig. 3</span></a>.</p>
+<section id="dots-in-a-two-dimensional-heterostructure-2deg">
+<h2>Dots in a two-dimensional heterostructure (2DEG)<a class="headerlink" href="#dots-in-a-two-dimensional-heterostructure-2deg" title="Permalink to this heading"></a></h2>
+<figure class="align-center" id="id1">
+<span id="fig-2deg"></span><a class="reference internal image-reference" href="../_images/quantum_dots-18.svg"><img alt="A 2DEG heterostructure" src="../_images/quantum_dots-18.svg" width="45.0%" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">GaAs/AlGaAs heterostructure hosting a double quantum dot. Mobile electrons
+from the thin silicon donor layer are attracted by the lower energy arising
+due to a smaller band gap in GaAs, all while being held close to their
+ionised donors.  As a result, electrons are confined along the <cite>z</cite> axis,
+creating a two-dimensional electron gas (2DEG). Wells and barriers in the
+potential profile created by voltages applied to electrostatic gates
+further localize electrons within the 2DEG.</span><a class="headerlink" href="#id1" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<p>Mobile electrons from a thin silicon donor layer within  AlGaAs layer are
+attracted by GaAs - AIGaAs  interface, marked in red in figure
+<a class="reference internal" href="#fig-2deg"><span class="std std-numref">Fig. 3</span></a>. This is due
+to the lower energy (energy profile depicted in black) they carry there. This
+effectively confines charges on a 2D plane.</p>
+<p>Control of the charges is achieved by applying voltages to electrostatic gates
+at the surface of the heterostructure. The electric field created by these
+gates repels electrons from underneath, creating a potential profile with
+barriers and wells and thus localising electrons. An illustration of
+electron confinement in one or several directions is depicted in
+<a class="reference internal" href="#fig-dims"><span class="std std-numref">Fig. 4</span></a>. By choosing appropriate gate voltages, electrons can be
+confined in two directions, creating a one dimensional channel, or in all
+three directions, resulting in an effectively zero dimensional system -
+the quantum dot. Note that in the case of a nanowire, charges are already
+confined in two directions and gate voltages only need to create barriers to
+localize them in the third direction. If the one dimensional confinement is
+very narrow, with a width comparable to the electron’s wavelength, the system
+is called a quantum point contact (QPC).</p>
+<figure class="align-center" id="id2">
+<span id="fig-dims"></span><a class="reference internal image-reference" href="../_images/quantum_dots-22.svg"><img alt="Dimensions of electron gases." src="../_images/quantum_dots-22.svg" width="50.0%" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">Dimensions of electron gases.</span><a class="headerlink" href="#id2" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="transport-through-quantum-dots">
+<h2>Transport through quantum dots<a class="headerlink" href="#transport-through-quantum-dots" title="Permalink to this heading"></a></h2>
+<p>The physics of quantum dots can be studied based on the dots’ transport
+properties, i.e. by measuring current through the system.
+To this end, a small bias voltage is applied to metallic reservoirs on both
+sides of the quantum dot device, allowing electrons to move between
+reservoirs and dots via tunnelling processes. Current probes attached to the
+reservoirs are used to measure the resulting current.
+The fundamental transport phenomenon in quantum dots is the Coulomb
+blockade (Van Houten et al 1992). The Coulomb blockade is a classical effect
+arising due to the Coulomb repulsion between electrons, resulting in a
+finite energy cost when adding an extra electron onto a dot.  At low enough
+temperatures, tunnelling of electrons between dots or dots and adjacent
+reservoirs can be suppressed and the device’s current-voltage relation no
+longer follows Ohm’s law.</p>
+<p>Once formed, quantum dots can be modelled as conducting islands connected to
+source (S) and drain (D), illustrated in <a class="reference internal" href="#fig-single-dot-model"><span class="std std-numref">Fig. 5</span></a> and
+<a class="reference internal" href="#fig-double-dot-model"><span class="std std-numref">Fig. 6</span></a>. Here, the conducting island is coloured grey,
+while source and drain are shown in blue. Couplings between
+dots and reservoirs are modelled as a resistor in parallel to a capacitor.</p>
+<figure class="align-center" id="id3">
+<span id="fig-single-dot-model"></span><a class="reference internal image-reference" href="../_images/quantum_dots-19.svg"><img alt="Simplified model of a single dot." src="../_images/quantum_dots-19.svg" width="45.0%" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 5 </span><span class="caption-text">Schematic of a single dot, modelled as a conducting island connected via
+tunnel junctions to source and drain reservoirs. A nearby plunger gate is
+capacitively coupled to the dot and used to tune the its energy levels.</span><a class="headerlink" href="#id3" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id4">
+<span id="fig-double-dot-model"></span><a class="reference internal image-reference" href="../_images/quantum_dots-20.svg"><img alt="Simplified model of a double dot." src="../_images/quantum_dots-20.svg" width="45.0%" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 6 </span><span class="caption-text">Schematic of a double dot, modelled as two conducting islands in series with
+source and drain reservoirs, coupled by tunnel junctions.</span><a class="headerlink" href="#id4" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<p>When a quantum dot is in the Coulomb blockade regime, transport through the
+dot-reservoir system only occurs when the dot’s energy level :math:epsilon
+falls between the energy levels of the reservoirs held at different bias
+potentials, also called the bias window.</p>
+<p>Transport through a double dot system is illustrated in figures
+<a class="reference internal" href="#fig-2d-hop-allowed"><span class="std std-numref">Fig. 7</span></a> and <a class="reference internal" href="#fig-2d-hop-forbidden"><span class="std std-numref">Fig. 8</span></a>.
+A  measurable current arises when one or both dot energy levels are within the
+energy levels of the reservoirs (fig. <a class="reference internal" href="#fig-2d-hop-allowed"><span class="std std-numref">Fig. 7</span></a>). To be
+precise, resonant tunnelling occurs when both dot levels are within the bias
+window. A so-called co-tunnelling process via virtual states takes place when
+only one potential is within the bias window (De Franceschi et al. 2001). The
+resonant current is typically higher in amplitude than the off-resonant current.
+The double-dot states are probed by stepping over the voltages of two
+nearby gates, resulting (in the most typical and ideal case) in the charge
+transition pattern illustrated in <a class="reference internal" href="#fig-chargediagram"><span class="std std-numref">Fig. 9</span></a>.</p>
+<p>Note that one often omits the small bias and talks about the alignment of the
+dots energy levels.
+If the levels don’t align, as in <a class="reference internal" href="#fig-2d-hop-forbidden"><span class="std std-numref">Fig. 8</span></a>, the dot
+is in the Coulomb blockade regime. Here, Coulomb repulsion between electrons prevents
+multiple electrons to occupy the same energy level and transport is suppressed.</p>
+<figure class="align-center" id="id5">
+<span id="fig-2d-hop-allowed"></span><a class="reference internal image-reference" href="../_images/quantum_dots-07.svg"><img alt="Electron transport of double dot: aligned energy levels." src="../_images/quantum_dots-07.svg" width="45.0%" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 7 </span><span class="caption-text">Electron transport via resonant tunnelling occurs from source to drain when
+both dot energy levels are within the bias window.</span><a class="headerlink" href="#id5" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id6">
+<span id="fig-2d-hop-forbidden"></span><a class="reference internal image-reference" href="../_images/quantum_dots-06.svg"><img alt="Electron transport of double dot: energy levels not aligned." src="../_images/quantum_dots-06.svg" width="45.0%" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 8 </span><span class="caption-text">Electron tunnelling is suppressed whenever the dots’ energy levels are not
+within the energy levels of the reservoirs. However, if one energy level is
+within the bias window, a measurable current arises due to a so-called
+co-tunnelling processes via virtual states.</span><a class="headerlink" href="#id6" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id7">
+<span id="fig-chargediagram"></span><a class="reference internal image-reference" href="../_images/quantum_dots-12.svg"><img alt="Schema of a charge diagram" src="../_images/quantum_dots-12.svg" width="40.0%" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 9 </span><span class="caption-text">Schema of a so-called charge diagram showing the charge
+transition pattern of a double dot.</span><a class="headerlink" href="#id7" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-center" id="id8">
+<span id="fig-chargediag-explained"></span><a class="reference internal image-reference" href="../_images/quantum_dots-04.svg"><img alt="" src="../_images/quantum_dots-04.svg" width="40.0%" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 10 </span><span class="caption-text">Illustration of charge transitions measured by varying both plunger gate
+voltages and monitoring current from source to drain. Four types of charge
+transitions are observed, exchanging charges between dots, a dot and its
+adjacent reservoir, or allowing a current to flow from source to drain.</span><a class="headerlink" href="#id8" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<p>Transport features of dots with well-localized and weakly coupled charges can
+be explained and qualitatively reproduced by the classical capacitance model,
+which represents gates, dots and reservoirs as conductors connected through
+resistors and capacitors. It also allows to capture the so-called gate
+cross-talk, i.e. the effect of capacitive couplings of all gates to each dot.
+The capacitance model is discussed in <a class="reference internal" href="../capacitance_model/index.html#capa-model"><span class="std std-ref">Capacitance model</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../overview/index.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../tuning/index.html" class="btn btn-neutral float-right" title="Tuning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jana Darulova.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

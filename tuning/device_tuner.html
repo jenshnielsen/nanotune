@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Device tuner &mdash; nanotune 0+untagged.1240.g4999340 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tuningstages" href="tuningstages.html" />
+    <link rel="prev" title="Manual tuning" href="manual_tuning.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> nanotune
+          </a>
+              <div class="version">
+                0+untagged.1240.g4999340
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quantum_dots/index.html">Quantum dots</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tuning</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="manual_tuning.html">Manual tuning</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Device tuner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tuner">Tuner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#characterizer">Characterizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dot-tuner">Dot tuner</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tuningstages.html">Tuningstages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="results_saving.html">Results saving</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../device/index.html">Device abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../drivers/index.html">Instruments &amp; interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/index.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit/index.html">Data fitting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../classification/index.html">Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../capacitance_model/index.html">Capacitance model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">nanotune API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">nanotune</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="index.html">Tuning</a> &raquo;</li>
+      <li>Device tuner</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tuning/device_tuner.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="device-tuner">
+<span id="id1"></span><h1>Device tuner<a class="headerlink" href="#device-tuner" title="Permalink to this heading"></a></h1>
+<section id="tuner">
+<h2>Tuner<a class="headerlink" href="#tuner" title="Permalink to this heading"></a></h2>
+<p>The base class implements the most common tuning methods such as updating a
+device’s normalization constants, measuring a pinchoff or taking a charge diagram.
+These methods use the corresponding <a class="reference internal" href="tuningstages.html#tuningstages"><span class="std std-ref">Tuningstages</span></a> to take and
+analyse data. In general, a tuner acts on an instance of
+<a class="reference internal" href="../device/index.html#device"><span class="std std-ref">Device abstraction</span></a> to perform the tuning. It has methods to combine default
+measurement settings defined in the tuner’s data and setpoint settings with
+device-related ones.</p>
+<dl class="simple">
+<dt>Measurement settings</dt><dd><p>Measurement related settings are grouped in two dataclasses, <cite>DataSettings</cite>
+and <cite>SetpointSettings</cite>. A tuner class keeps an instance of each with
+general settings used for tuning of all devices. Examples of setpoint
+setting used
+for all measurements are <cite>setpoint_method</cite>, optionally <cite>voltage_precision</cite> and
+high resolution precisions. As for data settings, data base location or
+size of charge diagram segments used for classification also stay unchanged
+in most cases.</p>
+</dd>
+</dl>
+<p>Beside the methods listed above, the base class also has a method to determine
+the initial ranges of a helper gate, such as
+a top barrier of a 2D layout or bottom gate underneath the entire 1D system.</p>
+<p>Tuning results are saved whenever a <cite>TuningResult</cite> is returned by a tuning stage,
+i.e. when measuring a pinchoff or charge diagram. They are saved to the tuner’s
+<cite>tuning_history</cite> using the device name as key. Saving results in these low
+lying methods used in every other tuning procedure ensures that all of them
+are retained.</p>
+</section>
+<section id="characterizer">
+<h2>Characterizer<a class="headerlink" href="#characterizer" title="Permalink to this heading"></a></h2>
+<p>The <cite>Characterizer</cite> sub-class implements the device characterization step by
+applying the base class’ gate characterization step to all gates. Optionally,
+gates can be left out, e.g. in the case of a helper gate which has been set
+beforehand.</p>
+</section>
+<section id="dot-tuner">
+<h2>Dot tuner<a class="headerlink" href="#dot-tuner" title="Permalink to this heading"></a></h2>
+<p>The <cite>DotTuner</cite> contains methods required to implement the tuning procedure
+shown in <a class="reference internal" href="#tuning-algorithm"><span class="std std-numref">Fig. 11</span></a>.
+If desired, the entire sequence can by run using the <cite>tune</cite> method, however
+all methods should also be seen as building blocks for other sequences.</p>
+<figure class="align-center" id="id2">
+<span id="tuning-algorithm"></span><a class="reference internal image-reference" href="../_images/algorithm_dot_tuning.svg"><img alt="dot tuning algorithm" src="../_images/algorithm_dot_tuning.svg" width="55%" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 11 </span><span class="caption-text">Dot tuning algorithm implemented by the <cite>DotTuner</cite> class.</span><a class="headerlink" href="#id2" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<p>The steps outlined in the diagram have a corresponding method within the class.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 38%" />
+<col style="width: 62%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>step</p></th>
+<th class="head"><p>method</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Set top barrier</p></td>
+<td><p><cite>set_helper_gate</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>Characterize central barrier
+Set central barrier</p></td>
+<td><p><cite>set_central_barrier</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>Characterize outer barriers
+Set outer barriers</p></td>
+<td><p><cite>set_outer_barriers</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>Characterize plungers</p></td>
+<td><p><cite>characterize_plunger</cite>, used in <cite>set_valid_plunger_ranges</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>Characterize charge stability diagram</p></td>
+<td><p><cite>get_charge_diagram</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>Classify charge state</p></td>
+<td><p>in <cite>get_charge_diagram</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>Change central barrier</p></td>
+<td><p><cite>update_gate_configuration</cite></p></td>
+</tr>
+</tbody>
+</table>
+<p>Note that <cite>get_charge_diagram</cite> adjusts plunger ranges if the resulting diagram
+shows a signal too low or too high for a dot regime. If the signal is too high,
+the plunger ranges are decreased and increased if too low. If the plunger ranges
+hit their safety voltage ranges during this update, outer barriers are
+adjusted. This is the small inner loop labelled <cite>no success</cite> on the left.
+Similarly, if no plunger ranges within the respective safety limits are found to
+begin with, the outer barriers are changed.</p>
+<p>When the desired dot regime is not found, <cite>update_gate_configuration</cite>
+which implements the loop going left and right from “Classify state”, is called.
+It executes <cite>adjust_all_barriers_loop</cite>, which in turn calls <cite>adjust_all_barriers</cite>,
+but with different inputs depending on the classification outcome.
+<cite>adjust_all_barriers_loop</cite> sets adjusts voltage of one gate, specified as input,
+before launching <cite>adjust_all_barriers</cite>.
+If required, i.e. adjusting outer or central barriers was not successful
+because they reached their safety limit, the helper gate is changed too.</p>
+<p>Specifically, these two outer loops in <a class="reference internal" href="#tuning-algorithm"><span class="std std-numref">Fig. 11</span></a>
+do teh following:</p>
+<dl class="simple">
+<dt>Large left loop - no good dot found:</dt><dd><ul class="simple">
+<li><p>Uses termination reasons to update outer barriers first. The decisive
+information is whether the device was too pinched off or open.</p></li>
+<li><p>Update top barrier/helper gate in <cite>adjust_all_barriers</cite>, called in <cite>adjust_all_barriers_loop</cite></p></li>
+</ul>
+</dd>
+<dt>Right loop - no success changing central barrier:</dt><dd><ul class="simple">
+<li><p>Change central barrier with <cite>initial_voltage_update</cite> in <cite>adjust_all_barriers_loop</cite>.</p></li>
+<li><p>If central barrier is set successfully, the loop in <cite>adjust_all_barriers_loop</cite> is not executed and thus tuning resumes with plunger range characterization.</p></li>
+<li><p>If after setting the central barrier other changes are needed, the loop in <cite>adjust_all_barriers_loop</cite> will set the top barrier, then central and also outer barriers.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The class also has methods to take high resolution charge diagram, with voltage
+precisions specified in <cite>setpoint_settings.high_res_precisions</cite>. There are two
+types of high res diagram: the entire one and only diagram segments which have
+been classified to be the target regime, e.g. good double. This serves to
+confirm the tuning result and get data for publications or presentations.</p>
+<p>Demonstration</p>
+<blockquote>
+<div><p>The
+<a class="reference external" href="https://journals.aps.org/prapplied/abstract/10.1103/PhysRevApplied.13.054005">autonomous tuning paper</a>
+showed that this tuning procedure is able to tune several devices without
+manual input. For good devices, only one pass through the algorithm is
+required, meaning only a few 1D and a one 2D measurement is taken.
+The loops adjusting barriers is not executed.</p>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="manual_tuning.html" class="btn btn-neutral float-left" title="Manual tuning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tuningstages.html" class="btn btn-neutral float-right" title="Tuningstages" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jana Darulova.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nanotune.data.export_data &mdash; nanotune 0+untagged.1240.g4999340 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link href="../../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> nanotune
+          </a>
+              <div class="version">
+                0+untagged.1240.g4999340
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quantum_dots/index.html">Quantum dots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tuning/index.html">Tuning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../device/index.html">Device abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../drivers/index.html">Instruments &amp; interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data/index.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../fit/index.html">Data fitting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../classification/index.html">Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../capacitance_model/index.html">Capacitance model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration/index.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">nanotune API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">nanotune</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>nanotune.data.export_data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for nanotune.data.export_data</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.fft</span> <span class="k">as</span> <span class="nn">fp</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">generic_gradient_magnitude</span><span class="p">,</span> <span class="n">sobel</span>
+<span class="kn">from</span> <span class="nn">skimage.transform</span> <span class="kn">import</span> <span class="n">resize</span>
+
+<span class="kn">import</span> <span class="nn">nanotune</span> <span class="k">as</span> <span class="nn">nt</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">N_2D</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;standard_shapes&quot;</span><span class="p">][</span><span class="s2">&quot;2&quot;</span><span class="p">]</span>
+<span class="n">NT_LABELS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;labels&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="export_label"><a class="viewcode-back" href="../../../api/data/export_data.html#nanotune.data.export_data.export_label">[docs]</a><span class="k">def</span> <span class="nf">export_label</span><span class="p">(</span>
+    <span class="n">ds_label</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="s2">&quot;str&quot;</span><span class="p">],</span>
+    <span class="n">quality</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Merges binary labels of single and double dot qualities to a single</span>
+<span class="sd">    label. Only if `dotregime` is specified, for all other the initial</span>
+<span class="sd">    quality labels are returned.</span>
+<span class="sd">    It translates a dot regime label to: 0 - poor singledot, 1 - good singledot,</span>
+<span class="sd">    2 - poor doubledot, 3 - good doubledot.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: new label.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">good</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">quality</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">category</span> <span class="o">==</span> <span class="s2">&quot;dotregime&quot;</span><span class="p">:</span>
+        <span class="n">singledot</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="s2">&quot;singledot&quot;</span> <span class="ow">in</span> <span class="n">ds_label</span> <span class="k">else</span> <span class="kc">False</span>
+        <span class="n">doubledot</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="s2">&quot;doubledot&quot;</span> <span class="ow">in</span> <span class="n">ds_label</span> <span class="k">else</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">good</span> <span class="ow">and</span> <span class="n">singledot</span><span class="p">:</span>
+            <span class="n">new_label</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">good</span> <span class="ow">and</span> <span class="n">singledot</span><span class="p">:</span>
+            <span class="n">new_label</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">good</span> <span class="ow">and</span> <span class="n">doubledot</span><span class="p">:</span>
+            <span class="n">new_label</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">good</span> <span class="ow">and</span> <span class="n">doubledot</span><span class="p">:</span>
+            <span class="n">new_label</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">elif</span> <span class="n">category</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;outerbarriers&quot;</span><span class="p">,</span> <span class="s2">&quot;pinchoff&quot;</span><span class="p">,</span> <span class="s2">&quot;singledot&quot;</span><span class="p">,</span> <span class="s2">&quot;doubledot&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds_label</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">ds_label</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">category</span><span class="p">:</span>
+            <span class="n">new_label</span> <span class="o">=</span> <span class="n">good</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">ds_label</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Wrong label-category combination in export_label.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;Do not know how to export/condense labels. Please &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;update export_label in export_data.py.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span>
+
+    <span class="k">return</span> <span class="n">new_label</span></div>
+
+
+<div class="viewcode-block" id="prep_data"><a class="viewcode-back" href="../../../api/data/export_data.html#nanotune.data.export_data.prep_data">[docs]</a><span class="k">def</span> <span class="nf">prep_data</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">nt</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">flip_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">readout_method_to_use</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;transport&#39;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]:</span>
+    <span class="sd">&quot;&quot;&quot;Prepares data for classification.</span>
+<span class="sd">    It combines normalized data, its gradient, Fourier frequencies and</span>
+<span class="sd">    extracted features into a multidimensional list.</span>
+<span class="sd">    All sublists are reshaped to a standard shape, defined in config.json</span>
+<span class="sd">    under the `standard_shapes` key.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataset: instance of nanotune dataset whose data should be prepared.</span>
+<span class="sd">        category: as which category/type of data, e.g. `pinchoff`, `singledot`</span>
+<span class="sd">            etc, it should be treated.</span>
+<span class="sd">        flip_data: whether data should be flipped. Used to simulate pinchoff</span>
+<span class="sd">            curves measured in rf sensing.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: multidimensional list. First sublist is normalized data,</span>
+<span class="sd">            second Fourier frequencies, third gradient and fourth features.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;features&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">power_spectrum</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">compute_power_spectrum</span><span class="p">()</span>
+
+    <span class="n">condensed_data_all</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># for readout_method in dataset.readout_methods.keys():</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">readout_method_to_use</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="k">if</span> <span class="n">flip_data</span><span class="p">:</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+    <span class="n">dimension</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">dimensions</span><span class="p">[</span><span class="n">readout_method_to_use</span><span class="p">]</span>
+
+    <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;standard_shapes&quot;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">dimension</span><span class="p">)])</span>
+    <span class="n">condensed_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+        <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;data_types&quot;</span><span class="p">]),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">shape</span><span class="p">))</span>
+    <span class="p">)</span>
+
+    <span class="n">relevant_features</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">category</span><span class="p">]</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="n">relevant_features</span><span class="p">:</span>
+                <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">readout_method_to_use</span><span class="p">][</span><span class="n">feat</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="n">relevant_features</span><span class="p">:</span>
+                <span class="n">features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="n">feat</span><span class="p">])</span>
+
+    <span class="c1"># double check if current range is correct:</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">min_curr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+        <span class="n">max_curr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="p">(</span><span class="n">signal</span> <span class="o">-</span> <span class="n">min_curr</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_curr</span> <span class="o">-</span> <span class="n">min_curr</span><span class="p">)</span>
+        <span class="c1"># assume we are talking dots and high current was not actually</span>
+        <span class="c1"># device_max_signal</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">readout_method_to_use</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">*</span> <span class="mf">0.3</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">compute_power_spectrum</span><span class="p">()</span>
+
+    <span class="n">data_resized</span> <span class="o">=</span> <span class="n">resize</span><span class="p">(</span>
+        <span class="n">signal</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">anti_aliasing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;edge&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="n">grad</span> <span class="o">=</span> <span class="n">generic_gradient_magnitude</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">sobel</span><span class="p">)</span>
+    <span class="n">gradient_resized</span> <span class="o">=</span> <span class="n">resize</span><span class="p">(</span>
+        <span class="n">grad</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">anti_aliasing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">power</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">power_spectrum</span><span class="p">[</span><span class="n">readout_method_to_use</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">frequencies_resized</span> <span class="o">=</span> <span class="n">resize</span><span class="p">(</span>
+        <span class="n">power</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">anti_aliasing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="n">pad_width</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_resized</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span>
+        <span class="n">features</span><span class="p">,</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pad_width</span><span class="p">),</span>
+        <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+        <span class="n">constant_values</span><span class="o">=</span><span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;fill_value&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">index</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;data_types&quot;</span><span class="p">][</span><span class="s2">&quot;signal&quot;</span><span class="p">]</span>
+    <span class="n">condensed_data</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">data_resized</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="n">index</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;data_types&quot;</span><span class="p">][</span><span class="s2">&quot;frequencies&quot;</span><span class="p">]</span>
+    <span class="n">condensed_data</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">frequencies_resized</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="n">index</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;data_types&quot;</span><span class="p">][</span><span class="s2">&quot;gradient&quot;</span><span class="p">]</span>
+    <span class="n">condensed_data</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">gradient_resized</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+    <span class="n">index</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;data_types&quot;</span><span class="p">][</span><span class="s2">&quot;features&quot;</span><span class="p">]</span>
+    <span class="n">condensed_data</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">features</span>
+
+    <span class="n">condensed_data_all</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">condensed_data</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">condensed_data_all</span></div>
+
+
+<div class="viewcode-block" id="export_data"><a class="viewcode-back" href="../../../api/data/export_data.html#nanotune.data.export_data.export_data">[docs]</a><span class="k">def</span> <span class="nf">export_data</span><span class="p">(</span>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">db_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">skip_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">add_flipped_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">quality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">db_folder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">readout_method_to_use</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;transport&#39;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Exports condensed data to a numpy file in a format used by</span>
+<span class="sd">    nanotune&#39;s Classifier.</span>
+
+<span class="sd">    The saved array contains the normalized signal, gradient, Fourier</span>
+<span class="sd">    frequencies and extracted features of each dataset. The machine learning</span>
+<span class="sd">    labels are attached to each of them to the very end.</span>
+<span class="sd">    A dataset of 15 1D measurements results in an array of (4, 15, 101),</span>
+<span class="sd">    where each trace has been reshaped to 100 points plus the label. The</span>
+<span class="sd">    first array[0, :, :] are all signals, array[1, :, :] the frequencies,</span>
+<span class="sd">    array is defined in config.json under `data_types`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        category: nt.config[&#39;core&#39;][&#39;features&#39;].keys()</span>
+<span class="sd">        db_names: names of databases whose data should be exported.</span>
+<span class="sd">        skip_ids: dict mapping database names to list of run IDs which should</span>
+<span class="sd">            be skipped.</span>
+<span class="sd">        add_flipped_data: whether or flipped data should be added as well.</span>
+<span class="sd">            a flipped pinchoff curve measured in transport for example</span>
+<span class="sd">            reproduces a pinchoff measured in rf.</span>
+<span class="sd">        quality: which qualities, e.g. only good or poor data, should be</span>
+<span class="sd">            exported. If none give, both will be taken.</span>
+<span class="sd">        filename: name of resulting numpy file. Default is the category name.</span>
+<span class="sd">        db_folder: folder where databases are located.</span>
+<span class="sd">        readout_method_to_use: which readout method to use if more than one</span>
+<span class="sd">            is available. Default is &#39;transport&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">db_names</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">category</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;core&#39;</span><span class="p">][</span><span class="s1">&#39;features&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unknown category. Please use on of the following: </span><span class="se">\</span>
+<span class="s2">            </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;core&#39;</span><span class="p">][</span><span class="s1">&#39;features&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">db_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_folder</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;db_folder&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">category</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;pinchoff&quot;</span><span class="p">,</span> <span class="s2">&quot;coulomboscillation&quot;</span><span class="p">,</span> <span class="s2">&quot;zerobiaspeak1D&quot;</span><span class="p">]:</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="n">category</span> <span class="o">==</span> <span class="s1">&#39;dotregime&#39;</span><span class="p">:</span>
+        <span class="n">stages</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;singledot&quot;</span><span class="p">,</span> <span class="s2">&quot;doubledot&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">stages</span> <span class="o">=</span> <span class="p">[</span><span class="n">category</span><span class="p">]</span>
+
+    <span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;standard_shapes&quot;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">dim</span><span class="p">)])</span>
+    <span class="n">condensed_data_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span>
+        <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;data_types&quot;</span><span class="p">]),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">shape</span><span class="p">))</span>
+    <span class="p">)</span>
+
+    <span class="n">relevant_ids</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">db_name</span> <span class="ow">in</span> <span class="n">db_names</span><span class="p">:</span>
+        <span class="n">relevant_ids</span><span class="p">[</span><span class="n">db_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">set_database</span><span class="p">(</span><span class="n">db_name</span><span class="p">,</span> <span class="n">db_folder</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">stage</span> <span class="ow">in</span> <span class="n">stages</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">relevant_ids</span><span class="p">[</span><span class="n">db_name</span><span class="p">]</span> <span class="o">+=</span> <span class="n">nt</span><span class="o">.</span><span class="n">get_dataIDs</span><span class="p">(</span>
+                    <span class="n">db_name</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="n">quality</span><span class="p">,</span> <span class="n">db_folder</span><span class="o">=</span><span class="n">db_folder</span><span class="p">,</span>
+                    <span class="n">get_run_ids</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">relevant_ids</span><span class="p">[</span><span class="n">db_name</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No labelled data found in </span><span class="si">{</span><span class="n">db_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Unable to load relevant ids in </span><span class="si">{</span><span class="n">db_name</span><span class="si">}</span><span class="s2">.&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">break</span>
+
+    <span class="n">labels_exp</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">db_name</span><span class="p">,</span> <span class="n">dataids</span> <span class="ow">in</span> <span class="n">relevant_ids</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">nt</span><span class="o">.</span><span class="n">set_database</span><span class="p">(</span><span class="n">db_name</span><span class="p">,</span> <span class="n">db_folder</span><span class="p">)</span>
+        <span class="n">skip_us</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">skip_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">skip_us</span> <span class="o">=</span> <span class="n">skip_ids</span><span class="p">[</span><span class="n">db_name</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No data IDs to skip in </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">db_name</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">d_id</span> <span class="ow">in</span> <span class="n">dataids</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">d_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">skip_us</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">d_id</span><span class="p">,</span> <span class="n">db_name</span><span class="p">,</span> <span class="n">db_folder</span><span class="o">=</span><span class="n">db_folder</span><span class="p">)</span>
+                    <span class="n">condensed_data</span> <span class="o">=</span> <span class="n">prep_data</span><span class="p">(</span>
+                        <span class="n">df</span><span class="p">,</span>
+                        <span class="n">category</span><span class="p">,</span>
+                        <span class="n">readout_method_to_use</span><span class="o">=</span><span class="n">readout_method_to_use</span><span class="p">)</span>
+                    <span class="n">new_label</span> <span class="o">=</span> <span class="n">export_label</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">ml_label</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">category</span><span class="p">)</span>
+                    <span class="n">condensed_data_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">condensed_data_all</span><span class="p">,</span> <span class="n">condensed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+                    <span class="p">)</span>
+                    <span class="n">labels_exp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_label</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">add_flipped_data</span><span class="p">:</span>
+                        <span class="n">condensed_data</span> <span class="o">=</span> <span class="n">prep_data</span><span class="p">(</span>
+                            <span class="n">df</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">flip_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">readout_method_to_use</span><span class="o">=</span><span class="n">readout_method_to_use</span>
+                        <span class="p">)</span>
+                        <span class="n">new_label</span> <span class="o">=</span> <span class="n">export_label</span><span class="p">(</span>
+                            <span class="n">df</span><span class="o">.</span><span class="n">ml_label</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span> <span class="n">category</span>
+                        <span class="p">)</span>
+                        <span class="n">condensed_data_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">condensed_data_all</span><span class="p">,</span> <span class="n">condensed_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+                        <span class="p">)</span>
+                        <span class="n">labels_exp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_label</span><span class="p">)</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">IndexError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">i_err</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">db_name</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">d_id</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">i_err</span><span class="p">)</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">condensed_data_all</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">n</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">data_w_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">data_w_labels</span><span class="p">[:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels_exp</span>
+    <span class="n">data_w_labels</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">condensed_data_all</span>
+
+    <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stages</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">data_w_labels</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="correct_normalizations"><a class="viewcode-back" href="../../../api/data/export_data.html#nanotune.data.export_data.correct_normalizations">[docs]</a><span class="k">def</span> <span class="nf">correct_normalizations</span><span class="p">(</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">db_folder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">db_folder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">db_folder</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;db_folder&quot;</span><span class="p">]</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">all_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">sg_indx</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;data_types&quot;</span><span class="p">][</span><span class="s2">&quot;signal&quot;</span><span class="p">]</span>
+
+    <span class="n">images</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">sg_indx</span><span class="p">])</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">high_current_images</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">high_current_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">high_current_images</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># print(len(high_current_ids))</span>
+
+    <span class="k">for</span> <span class="n">exid</span> <span class="ow">in</span> <span class="n">high_current_ids</span><span class="p">:</span>
+        <span class="c1"># print(np.max(data[sg_indx, exid]))</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">sg_indx</span><span class="p">,</span> <span class="n">exid</span><span class="p">]</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="p">(</span><span class="n">sig</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">sig</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">sig</span><span class="p">))</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">sig</span> <span class="o">*</span> <span class="mf">0.3</span>  <span class="c1"># assume it&#39;s dots and highest current is not max current</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">sg_indx</span><span class="p">,</span> <span class="n">exid</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig</span>
+
+        <span class="n">freq_spect</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">fft2</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
+        <span class="n">freq_spect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">freq_spect</span><span class="p">))</span>
+
+        <span class="n">grad</span> <span class="o">=</span> <span class="n">generic_gradient_magnitude</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="n">sobel</span><span class="p">)</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;data_types&quot;</span><span class="p">][</span><span class="s2">&quot;frequencies&quot;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="n">exid</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">freq_spect</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="n">nt</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;core&quot;</span><span class="p">][</span><span class="s2">&quot;data_types&quot;</span><span class="p">][</span><span class="s2">&quot;gradient&quot;</span><span class="p">]</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="n">exid</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">grad</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">n</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">data_w_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">data_w_labels</span><span class="p">[:,</span> <span class="p">:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels</span>
+    <span class="n">data_w_labels</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">db_folder</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">data_w_labels</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jana Darulova.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

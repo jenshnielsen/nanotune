@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Device abstraction &mdash; nanotune 0+untagged.1240.g4999340 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Instruments &amp; interfaces" href="../drivers/index.html" />
+    <link rel="prev" title="Results saving" href="../tuning/results_saving.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> nanotune
+          </a>
+              <div class="version">
+                0+untagged.1240.g4999340
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../quantum_dots/index.html">Quantum dots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuning/index.html">Tuning</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Device abstraction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#device-layout">Device layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#normalization-constants">Normalization constants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#device-channel">Device channel</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../drivers/index.html">Instruments &amp; interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data/index.html">Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../fit/index.html">Data fitting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../classification/index.html">Classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../capacitance_model/index.html">Capacitance model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration/index.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">nanotune API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">nanotune</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Device abstraction</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/device/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="device-abstraction">
+<span id="device"></span><h1>Device abstraction<a class="headerlink" href="#device-abstraction" title="Permalink to this heading"></a></h1>
+<p>The physical device or sample is represented by an instance of a <cite>Device</cite> class, which
+in turn is a QCodeS <cite>DelegateInstrument</cite>. The <cite>Device</cite> class extends its base
+class by adding
+attributes and methods specific to the characterization and
+dot-initialization process.
+Beside the initialization of instrument parameters and channels, the following
+attributes are meant to assist in the tuning process:</p>
+<dl class="simple">
+<dt>List of gates and ohmics</dt><dd><p>Gates and ohmics are grouped in separate lists in the order specified by
+a device layout. The index of each gate or ohmic within the respective
+list should be the item’s ID, either <cite>gate_id</cite> or <cite>ohmic_id</cite>. A device
+layout is specified via a subclass of <cite>DeviceLayout</cite>.</p>
+</dd>
+<dt>Readout</dt><dd><p>How and with which parameters the device should be read out. It is an
+instance of the <cite>Readout</cite> dataclass where each
+attribute, one for each readout method, is either a QcoDes <cite>Parameter</cite> or
+<cite>GroupedParameter</cite>. Typical readout method types are transport, sensing
+and rf.</p>
+</dd>
+<dt>Main readout method</dt><dd><p>Indicating which readout method should be used to make tuning decisions.
+Features extracted during a data fit can vary between readout methods,
+some of which
+can have more noise than others. nanotune’s fitting procedures perform a fit
+on all of them, but only one is used decide e.g. whether the result is a
+good one or how gates should be adjusted next.
+It is added to static metadata and thus to every dataset measured.</p>
+</dd>
+<dt>Normalization constants</dt><dd><p>Keeping track of the highest and lowest signals, i.e. noise floor and open device
+signal. These values are required for correct classification and need to
+be measured before tuning and every time settings on
+readout instruments are changed. Each readout method has its own constants.
+They are saved to static metadata of the device and thus to metadata of each
+dataset measured. A separate dataclass is used as a
+container.</p>
+</dd>
+<dt>Current valid ranges</dt><dd><p>The voltages ranges within which we expect the desired features to occur,
+determined during tuning. If known, these are the current ranges within
+which to tune. They typically depend on
+voltages of other gates and need to be updated during tuning. These
+are also the ranges which will be swept during measurements.</p>
+</dd>
+<dt>Initial valid ranges</dt><dd><p>The voltages ranges within which we expect the desired features to occur
+before any tuning has been done. They can be used if ranges can be narrowed down
+based on prior knowledge such as measurements of other samples or when
+a device is loaded pre-tuned.
+Will be set to each gate’s safety range if not specified.</p>
+</dd>
+<dt>Transition voltages</dt><dd><p>Voltages at which a gate is able to deplete the electron gas nearby.
+Specifically, it is the voltage at which the measured signal drops from open
+to closed regime. These are determined during tuning and depend on voltages
+set to other gates.</p>
+</dd>
+<dt>Quality</dt><dd><p>Indicating whether the device is fully functional and can thus be considered
+for dot tuning.</p>
+</dd>
+</dl>
+<p>The class also has a convenience methods manipulating all gates collectively,
+which are used for initialization, resetting and normalization constant
+measurements.</p>
+<p>The device can be initialized using a yaml file. Here an example of a dot
+device with three gates, already known normalization constants (which could
+be the case when re-loading a device), two readout instruments hooked up
+and some known tuning parameters.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">instruments</span><span class="p">:</span><span class="w"></span>
+
+<span class="nt">device_example</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nanotune.device.device.Device</span><span class="w"></span>
+<span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">init</span><span class="p p-Indicator">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">device_type</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">doubledot</span><span class="w"></span>
+<span class="w">    </span><span class="nt">normalization_constants</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">transport</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span><span class="w"></span>
+<span class="w">      </span><span class="nt">sensing</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">-0.3</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0.6</span><span class="p p-Indicator">]</span><span class="w"></span>
+<span class="w">    </span><span class="nt">channels</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nanotune.device.device_channel.DeviceChannel</span><span class="w"></span>
+<span class="w">      </span><span class="nt">top_barrier</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">channel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dac.ch01</span><span class="w"></span>
+<span class="w">        </span><span class="nt">gate_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"></span>
+<span class="w">      </span><span class="nt">left_plunger</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">channel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dac.ch02</span><span class="w"></span>
+<span class="w">        </span><span class="nt">gate_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+<span class="w">      </span><span class="nt">left_ohmic</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">channel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dac.ch10</span><span class="w"></span>
+<span class="w">        </span><span class="nt">ohmic_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w"></span>
+<span class="w">    </span><span class="nt">readout</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">transport</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">lockin.X</span><span class="w"></span>
+<span class="w">      </span><span class="nt">sensing</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">rf.phase</span><span class="w"></span>
+<span class="w">    </span><span class="nt">initial_valid_ranges</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">top_barrier</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">-3</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0</span><span class="p p-Indicator">]</span><span class="w"></span>
+<span class="w">    </span><span class="nt">current_valid_ranges</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">top_barrier</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">-0.5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0</span><span class="p p-Indicator">]</span><span class="w"></span>
+<span class="w">    </span><span class="nt">transition_voltages</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">top_barrier</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-0.4</span><span class="w"></span>
+</pre></div>
+</div>
+<section id="device-layout">
+<h2>Device layout<a class="headerlink" href="#device-layout" title="Permalink to this heading"></a></h2>
+<p>The <cite>DeviceLayout</cite> class serves as interface for specifying a device
+layout. A subclass needs to implement the methods which return the gate IDs of
+device channels serving the specific purpose. For example, the method
+<cite>barriers</cite> needs to return the gate IDs of all barriers of the device.
+<cite>DeviceLayout</cite> is a dataclass inheriting from the abstract <cite>IDeviceLayout</cite>.
+An example of a device layout is <cite>DoubleDotLayout</cite>.</p>
+</section>
+<section id="normalization-constants">
+<h2>Normalization constants<a class="headerlink" href="#normalization-constants" title="Permalink to this heading"></a></h2>
+<p>This dataclass is used to hold and update normalization constants of a device.
+Each attribute keeps track of the constants of one readout method, e.g.
+transport, sensing and rf.</p>
+</section>
+<section id="device-channel">
+<h2>Device channel<a class="headerlink" href="#device-channel" title="Permalink to this heading"></a></h2>
+<p>A <cite>DeviceChannel</cite> is a wrapper of an instrument channel, e.g. a
+DAC channel, but with added functionalities. The channel wrapped and passed to
+init function needs to either implement the methods of a <cite>DACChannelInterface</cite>
+described in
+<a class="reference internal" href="../drivers/index.html#drivers"><span class="std std-ref">Instruments &amp; interfaces</span></a>, or be in subclass thereof. This interface setup ensures that
+channels of different instruments can be used, where it is up to the user to
+implement the ‘glue’ between hardware and software.</p>
+<p>Main attributes of <cite>DeviceChannel</cite> are:</p>
+<dl class="simple">
+<dt>Gate ID</dt><dd><p>Identifier indicating which gate of a device the channel
+represents. Example: a left barrier’s ID of a <cite>DoubleDotLayout</cite> is 1.</p>
+</dd>
+<dt>Ohmic ID</dt><dd><p>Identifier indicating which ohmic of a sample or device the channel
+represents.</p>
+</dd>
+<dt>Safety voltage range</dt><dd><p>Voltage range within which the gate is guaranteed not to damage the
+device.</p>
+</dd>
+<dt>Supports hardware ramp</dt><dd><p>Whether the instrument channel and thus instrument itself can sweep/set
+voltages with a hardware ramp.</p>
+</dd>
+<dt>Use ramp</dt><dd><p>Whether voltages should be set or ramped.</p>
+</dd>
+<dt>Ramp rate</dt><dd><p>Rate at which voltages should be ramped if <cite>use_ramp = True</cite>.</p>
+</dd>
+<dt>Max voltage step</dt><dd><p>Maximum voltage step supported by the gate, i.e. the largest voltage change
+that can be set without ramping such that the device is not damaged.</p>
+</dd>
+<dt>Relay state</dt><dd><p>If the DAC has relay states, this attribute indicates the current
+setting of it. Examples: ground or floating.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../tuning/results_saving.html" class="btn btn-neutral float-left" title="Results saving" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../drivers/index.html" class="btn btn-neutral float-right" title="Instruments &amp; interfaces" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Jana Darulova.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
